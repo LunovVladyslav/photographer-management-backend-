@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/photo_db
+    username: photographer
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+minio:
+  url: http://localhost:9000
+  access-key: photographer
+  secret-key: password
+  bucket-name: my-bucket
+
+server:
+  address: 0.0.0.0
+  port: 8888

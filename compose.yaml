@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=photo_db'
+      - 'POSTGRES_PASSWORD=password'
+      - 'POSTGRES_USER=photographer'
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgres_data:/var/lib/postgresql/data'
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      - 'MINIO_ROOT_USER=photographer'
+      - 'MINIO_ROOT_PASSWORD=password'
+    volumes:
+      - 'minio_data:/data'
+    command: server /data --console-address ":9001"
+
+  minio-create-bucket:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 photographer password;
+      /usr/bin/mc mb myminio/my-bucket --ignore-existing;
+      /usr/bin/mc anonymous set public myminio/my-bucket;
+      exit 0;
+      "
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
