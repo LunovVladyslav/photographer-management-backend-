@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PhotgrapherBackendApplication {
+public class PhotographerBackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PhotgrapherBackendApplication.class, args);
+        SpringApplication.run(PhotographerBackendApplication.class, args);
     }
 
 }

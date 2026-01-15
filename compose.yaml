@@ -8,7 +8,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - 'postgres_data:/var/lib/postgresql/data'
+      - 'postgres_data:/var/lib/postgresql'
 
   minio:
     image: minio/minio:latest
@@ -23,20 +23,53 @@ services:
       - 'minio_data:/data'
     command: server /data --console-address ":9001"
 
-  minio-create-bucket:
-    image: minio/mc:latest
-    depends_on:
-      - minio
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 photographer password;
-      /usr/bin/mc mb myminio/my-bucket --ignore-existing;
-      /usr/bin/mc anonymous set public myminio/my-bucket;
-      exit 0;
-      "
+#  minio-create-bucket:
+#    image: minio/mc:latest
+#    depends_on:
+#      - minio
+#    entrypoint: >
+#      /bin/sh -c "
+#      /usr/bin/mc alias set myminio http://minio:9000 photographer password;
+#      /usr/bin/mc mb myminio/my-bucket --ignore-existing;
+#      /usr/bin/mc anonymous set public myminio/my-bucket;
+#      exit 0;
+#      "
+
+  maildev:
+    image: maildev/maildev:latest
+    container_name: maildev
+    ports:
+      - '1080:1080'
+      - '1025:1025'
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_VHOST: /
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
 volumes:
   postgres_data:
     driver: local
   minio_data:
     driver: local
+  rabbitmq_data:
+    driver: local
+  rabbitmq_log:
+      driver: local

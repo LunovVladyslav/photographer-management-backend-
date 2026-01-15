@@ -1,19 +1,49 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBIT_USER:admin}
+    password: ${RABBIT_PASSWORD:admin}
+
+  mail:
+    host: localhost
+    port: 1025
+    username: # залиште пустим для MailDev
+    password: # залиште пустим для MailDev
+    properties:
+      mail:
+        smtp:
+          auth: false  # MailDev не потребує авторизації
+          starttls:
+            enable: false  # MailDev не потребує TLS
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    protocol: smtp
   datasource:
-    url: jdbc:postgresql://localhost:5432/photo_db
-    username: photographer
-    password: password
+    url: ${DB_URL}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: create-drop
 
 minio:
   url: http://localhost:9000
-  access-key: photographer
-  secret-key: password
-  bucket-name: my-bucket
+  access-key: ${MINIO_KEY}
+  secret-key: ${MINIO_PASSWORD}
+  bucket-name: ${MINIO_BUCKET}
 
 server:
   address: 0.0.0.0
   port: 8888
+  tomcat:
+    max-swallow-size: 1024MB
+    max-http-form-post-size: 1024MB
